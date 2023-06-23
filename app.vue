@@ -85,6 +85,8 @@ const mousePosition = ref({ x: 0, y: 0 });
 const onMouseMove = (e) => {
   mousePosition.value = { x: e.clientX, y: e.clientY };
 }
+
+watch(() => user.value, () => refresh());
 </script>
 
 <style scoped>
