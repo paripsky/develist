@@ -17,7 +17,7 @@
       <ul class="flex flex-col gap-4">
         <li v-for="category in categoriesWithItems" class="my-2">
           <UBadge size="lg" :color="category.color" class="mb-2 flex gap-1">{{ category.title }}
-            <UIcon :name="category.icon" />
+            <UIcon v-if="category.icon" :name="category.icon" />
           </UBadge>
           <ul class="grid sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
             <HoverCard class="card group" v-for="item in category.items" :mousePosition="mousePosition"
@@ -48,6 +48,7 @@
 <script setup>
 const user = useSupabaseUser();
 const client = useSupabaseClient();
+const route = useRoute();
 
 const editing = ref(null);
 
@@ -58,9 +59,16 @@ const tagIcons = {
   node: 'i-mdi-nodejs',
 };
 
-const { data: categories, refresh } = await useAsyncData('entries', async () => {
-  const { data: entries } = user?.value ? await client.from('entries').select('*') : { data: [] };
-  const { data: tags } = user?.value ? await client.from('tags').select('*') : { data: [] };
+const { data: categories, refresh } = await useAsyncData('list', async () => {
+  console.log(route);
+  if (!user.value && !route.query.link) return [];
+  const entries = await $fetch(`/api/list`, {
+    headers: useRequestHeaders(['cookie']),
+    query: {
+      link: route.query.link,
+    }
+  });
+  const { data: tags } = await client.from('tags').select('*');
 
   const entriesByCategory = entries.reduce((acc, entry) => {
     entry.tags.forEach((tag) => {
@@ -86,7 +94,10 @@ const onMouseMove = (e) => {
   mousePosition.value = { x: e.clientX, y: e.clientY };
 }
 
-watch(() => user.value, () => refresh());
+watch(() => user.value, (currentUser, previousUser) => {
+  if (currentUser?.id && previousUser?.id) return;
+  refresh();
+});
 </script>
 
 <style scoped>

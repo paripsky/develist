@@ -1,7 +1,7 @@
 
 <template>
   <div>
-    <UTooltip text="Login to start building your own develist" :prevent="user">
+    <UTooltip text="Login to start building your own develist" :prevent="!!user">
       <UButton label="New" icon="i-heroicons-plus" @click="resetAndOpen" :disabled="!user" />
     </UTooltip>
 
