@@ -98,7 +98,7 @@ const tagIcons = {
 };
 
 const { data: list, refresh } = await useAsyncData('list', async () => {
-  if (!user.value && !route.query.link) return [];
+  if (!user.value && !route.query.link) return { categories: [], ownerName: '' };
   const { entries, owner } = await $fetch(`/api/entries`, {
     headers: useRequestHeaders(['cookie']),
     query: {
