@@ -2,10 +2,10 @@
 <template>
   <div>
     <UTooltip text="Login to start building your own develist" :prevent="!!user">
-      <UButton label="New" icon="i-heroicons-plus" @click="resetAndOpen" :disabled="!user" />
+      <UButton label="New" icon="i-heroicons-plus" @click="resetAndOpen()" :disabled="!user" />
     </UTooltip>
 
-    <UModal v-model="isOpen" @close="resetAndClose">
+    <UModal v-model="isOpen" @close="resetAndClose()">
       <UCard :ui="{ divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
         <template #header>
           {{ entry ? 'Edit' : 'Add' }} Entry
@@ -36,9 +36,11 @@
 
         <template #footer>
           <div class="flex flex-row-reverse gap-2">
-            <UButton @click="entry ? updateEntry() : addEntry()" :loading="isLoading">{{ entry ? 'Save' : 'Add' }}
+            <UButton @click="entry ? updateEntry() : addEntry()"
+              :disabled="isLoading || !title || !url || !description || !image || !tags.length" :loading="isLoading">{{
+                entry ? 'Save' : 'Add' }}
             </UButton>
-            <UButton variant="outline" @click="resetAndClose" :disabled="isLoading">Cancel</UButton>
+            <UButton variant="outline" @click="resetAndClose()" :disabled="isLoading">Cancel</UButton>
           </div>
         </template>
       </UCard>
