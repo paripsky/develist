@@ -1,15 +1,27 @@
 <template>
   <nav>
-    <UContainer class="flex justify-end gap-2 p-2 2xl:max-w-[1920px]">
-      <ThemeSelect />
+    <UContainer class="flex items-center justify-end gap-2 p-2 2xl:max-w-[1920px]">
+      <span v-if="list.ownerName" class="mr-auto">{{ list.ownerName }}'s Develist</span>
+      <UPopover>
+        <template #default="{ open }">
+          <UButton color="gray" variant="ghost" square :class="[open && 'bg-gray-50 dark:bg-gray-800']">
+            <UIcon name="i-heroicons-swatch-20-solid" class="w-5 h-5 text-primary-500 dark:text-primary-400" />
+          </UButton>
+        </template>
+
+        <template #panel>
+          <ColorPicker />
+        </template>
+      </UPopover>
+      <ColorModeButton />
       <Login />
     </UContainer>
   </nav>
   <main @mousemove="onMouseMove">
     <UContainer class="pt-6 md:pt-20 2xl:max-w-[1920px]">
-      <div class="flex justify-end gap-2">
+      <div class="flex justify-end gap-2" v-if="!list.isLink">
         <UButton variant="ghost">Share</UButton>
-        <AddEntry :entry="editing" :tags="categories" @save="refresh" @reset="editing = null" />
+        <AddEntry :entry="editing" :tags="list.categories" @save="refresh" @reset="editing = null" />
       </div>
       <div v-if="!categoriesWithItems?.length">
         Add your first develist entry or start from a template
@@ -46,6 +58,32 @@
 </template>
 
 <script setup>
+useSeoMeta({
+  title: 'Develist - Manage Your Development Tools and Resources',
+  description: 'A web application built using Nuxt 3 and Supabase to help developers manage and organize their development tools and resources.',
+  ogTitle: 'Develist - Manage Your Development Tools and Resources',
+  ogDescription: 'A web application built using Nuxt 3 and Supabase to help developers manage and organize their development tools and resources.',
+  // ogImage: 'https://example.com/develist.png',
+  ogUrl: 'https://develist.vercel.com',
+  twitterTitle: 'Develist - Manage Your Development Tools and Resources',
+  twitterDescription: 'A web application built using Nuxt 3 and Supabase to help developers manage and organize their development tools and resources.',
+  // twitterImage: 'https://example.com/develist.png',
+  twitterCard: 'summary'
+})
+
+useHead({
+  htmlAttrs: {
+    lang: 'en'
+  },
+  link: [
+    {
+      rel: 'icon',
+      type: 'image/png',
+      href: '/favicon.png'
+    }
+  ]
+})
+
 const user = useSupabaseUser();
 const client = useSupabaseClient();
 const route = useRoute();
@@ -59,10 +97,9 @@ const tagIcons = {
   node: 'i-mdi-nodejs',
 };
 
-const { data: categories, refresh } = await useAsyncData('list', async () => {
-  console.log(route);
+const { data: list, refresh } = await useAsyncData('list', async () => {
   if (!user.value && !route.query.link) return [];
-  const entries = await $fetch(`/api/list`, {
+  const { entries, owner } = await $fetch(`/api/entries`, {
     headers: useRequestHeaders(['cookie']),
     query: {
       link: route.query.link,
@@ -79,14 +116,18 @@ const { data: categories, refresh } = await useAsyncData('list', async () => {
     return acc;
   }, {});
 
-  return tags.map((tag) => ({
-    ...tag,
-    icon: tagIcons[tag.id],
-    items: entriesByCategory[tag.id] ?? []
-  }));
+  return {
+    categories: tags.map((tag) => ({
+      ...tag,
+      icon: tagIcons[tag.id],
+      items: entriesByCategory[tag.id] ?? []
+    })),
+    ownerName: owner?.name ?? user.value.user_metadata?.name,
+    isLink: !!route.query.link,
+  };
 });
 
-const categoriesWithItems = computed(() => categories.value.filter(({ items }) => items.length))
+const categoriesWithItems = computed(() => list.value.categories.filter(({ items }) => items.length))
 
 const mousePosition = ref({ x: 0, y: 0 });
 

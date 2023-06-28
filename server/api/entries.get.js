@@ -6,22 +6,25 @@ async function getEntriesFromSharedLink({ event, linkId }) {
   const [sharedLink] = sharedLinks ?? [];
   if (!sharedLink?.user_id) return [];
 
+  const linkOwner = await client.auth.admin.getUserById(sharedLink.user_id);
+  const owner = { name: linkOwner.data?.user?.user_metadata?.name };
   const { data: entries } = await client.from('entries').select('*').eq('user_id', sharedLink.user_id);
 
-  return entries;
+  return { entries, owner };
 }
 
 async function getEntries({ event }) {
   const client = serverSupabaseClient(event);
   const { data: entries } = await client.from('entries').select('*');
 
-  return entries;
+  return { entries };
 }
 
+// TODO: add search support? or just client for now
 export default defineEventHandler(async (event) => {
   const query = getQuery(event);
   const linkId = query.link;
-  const entries = linkId ? await getEntriesFromSharedLink({ event, linkId }) : await getEntries({ event });
+  const { entries, owner } = linkId ? await getEntriesFromSharedLink({ event, linkId }) : await getEntries({ event });
 
-  return entries;
+  return { entries, owner };
 });

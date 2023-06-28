@@ -10,14 +10,14 @@
   },
   "devDependencies": {
     "@nuxt/devtools": "latest",
-    "@nuxthq/ui": "^2.3.0",
-    "@nuxtjs/supabase": "^0.3.6",
-    "@types/node": "^18",
-    "nuxt": "^3.5.2"
+    "@nuxthq/ui": "^2.5.0",
+    "@nuxtjs/supabase": "^0.3.7",
+    "@types/node": "^20",
+    "nuxt": "^3.6.1"
   },
   "dependencies": {
     "@iconify-json/heroicons": "^1.1.11",
-    "@iconify-json/lucide": "^1.1.99",
+    "@iconify-json/lucide": "^1.1.105",
     "@iconify-json/mdi": "^1.1.52"
   }
 }

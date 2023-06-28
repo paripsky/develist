@@ -1,3 +1,5 @@
+import colors from 'tailwindcss/colors';
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
@@ -8,5 +10,6 @@ export default defineNuxtConfig({
   },
   ui: {
     icons: ['mdi', 'lucide', 'heroicons'],
+    safelistColors: Object.keys(colors),
   }
 })
