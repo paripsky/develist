@@ -74,9 +74,9 @@ This project is licensed under the [MIT License](LICENSE).
 Develist is built upon the amazing technologies and open-source projects.
 Special thanks to the following:
 
-- [Nuxt 3](https://nuxtjs.org) - The Vue.js framework for building modern web
+- [Nuxt 3](https://nuxtjs.com) - The Vue.js framework for building modern web
   applications.
-- [Supabase](https://supabase.io) - An open-source Firebase alternative for
+- [Supabase](https://supabase.com) - An open-source Firebase alternative for
   building and scaling applications.
-- [NuxtLabs UI](https://labs.nuxtjs.org/ui) - Beautifully designed UI components
+- [NuxtLabs UI](https://ui.nuxtlabs.com/) - Beautifully designed UI components
   for Nuxt.js applications.
