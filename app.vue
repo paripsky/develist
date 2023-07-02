@@ -79,7 +79,13 @@ useHead({
     {
       rel: 'icon',
       type: 'image/x-icon',
-      href: '/favicon.ico'
+      href: '/favicon.ico',
+      sizes: 'any',
+    },
+    {
+      rel: 'apple-touch-icon',
+      type: 'image/png',
+      href: '/apple-touch-icon.png',
     }
   ]
 })
