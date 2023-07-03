@@ -1,7 +1,7 @@
 <template>
   <div>
     <UTooltip text="Create your list to enable sharing" :prevent="!!user">
-      <UButton variant="ghost" :disabled="!user" label="Share" @click="handleShare()" />
+      <UButton id="share-button" variant="ghost" :disabled="!user" label="Share" @click="handleShare()" />
     </UTooltip>
   </div>
 </template>
@@ -26,9 +26,11 @@ const handleShare = async () => {
     shareLinkId = newLink?.id;
   }
 
+  shareLink.value = shareLinkId;
+
   const fullLinkUrl = new URL('', location.origin);
   fullLinkUrl.searchParams.append('link', shareLinkId);
   await navigator.clipboard.writeText(fullLinkUrl.toString());
-  toast.add({ title: 'Share link was copied to your clipboard!', color: 'primary' });
+  toast.add({ id: 'shareLink', title: 'Share link was copied to your clipboard!', color: 'primary' });
 }
 </script>
