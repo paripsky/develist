@@ -20,7 +20,7 @@
   <main @mousemove="onMouseMove">
     <UContainer class="pt-6 md:pt-20 2xl:max-w-[1920px]">
       <div class="flex justify-end gap-2" v-if="!list.isLink">
-        <UButton variant="ghost">Share</UButton>
+        <ShareButton />
         <AddEntry :entry="editing" :tags="list.categories" @save="refresh" @reset="editing = null" />
       </div>
       <div v-if="!categoriesWithItems?.length">
