@@ -101,6 +101,12 @@ const tagIcons = {
   vue: 'i-mdi-vuejs',
   angular: 'i-mdi-angular',
   node: 'i-mdi-nodejs',
+  css: 'i-mdi-language-css3',
+  ideAndTextEditors: 'i-mdi-file-code',
+  deno: 'i-mdi-dinosaur-pixel',
+  icons: 'i-mdi-tag-emoticon',
+  databases: 'i-mdi-database',
+  macApps: 'i-mdi-apple',
 };
 
 const { data: list, refresh } = await useAsyncData('list', async () => {
