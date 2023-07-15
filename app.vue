@@ -23,7 +23,26 @@
         <ShareButton />
         <AddEntry :entry="editing" :tags="list.categories" @save="refresh" @reset="editing = null" />
       </div>
-      <div v-if="!categoriesWithItems?.length">
+      <ul class="flex flex-col gap-4" v-if="pending">
+        <li class="space-y-2 mt-2" v-for="i in 3">
+          <USkeleton class="h-6 w-[100px]" />
+          <ul class="grid sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+            <li>
+              <USkeleton class="h-80 w-full" />
+            </li>
+            <li>
+              <USkeleton class="h-80 w-full" />
+            </li>
+            <li>
+              <USkeleton class="h-80 w-full" />
+            </li>
+            <li>
+              <USkeleton class="h-80 w-full" />
+            </li>
+          </ul>
+        </li>
+      </ul>
+      <div v-if="!pending && !categoriesWithItems?.length">
         Add your first develist entry or start from a template
       </div>
       <ul class="flex flex-col gap-4">
@@ -109,7 +128,7 @@ const tagIcons = {
   macApps: 'i-mdi-apple',
 };
 
-const { data: list, refresh } = await useAsyncData('list', async () => {
+const { data: list, refresh, pending } = await useAsyncData('list', async () => {
   if (!user.value && !route.query.link) return { categories: [], ownerName: '' };
   const { entries, owner } = await $fetch(`/api/entries`, {
     headers: useRequestHeaders(['cookie']),
