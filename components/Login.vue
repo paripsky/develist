@@ -6,7 +6,7 @@
   <div class="flex sm:hidden gap-2" v-if="!user">
     <UButton @click="isOpen = true">Login</UButton>
   </div>
-  <UModal v-if="!user" v-model="isOpen" @close="resetAndClose">
+  <UModal v-if="!user" v-model="isOpen" @close="resetAndClose()">
     <UCard>
       <div class="flex flex-col gap-2">
         <UButton @click="login('google')">Login with Google</UButton>

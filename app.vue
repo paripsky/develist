@@ -129,33 +129,39 @@ const tagIcons = {
 };
 
 const { data: list, refresh, pending } = await useAsyncData('list', async () => {
-  if (!user.value && !route.query.link) return { categories: [], ownerName: '' };
-  const { entries, owner } = await $fetch(`/api/entries`, {
-    headers: useRequestHeaders(['cookie']),
-    query: {
-      link: route.query.link,
-    }
-  });
-  const { data: tags } = await client.from('tags').select('*');
+  const emptyResponse = { categories: [], ownerName: '', isLink: false };
+  if (!user.value && !route.query.link) return emptyResponse;
 
-  const entriesByCategory = entries.reduce((acc, entry) => {
-    entry.tags.forEach((tag) => {
-      acc[tag] ??= [];
-      acc[tag].push(entry);
+  try {
+    const { entries, owner } = await $fetch(`/api/entries`, {
+      headers: useRequestHeaders(['cookie']),
+      query: {
+        link: route.query.link,
+      }
     });
+    const { data: tags } = await client.from('tags').select('*');
 
-    return acc;
-  }, {});
+    const entriesByCategory = entries.reduce((acc, entry) => {
+      entry.tags.forEach((tag) => {
+        acc[tag] ??= [];
+        acc[tag].push(entry);
+      });
 
-  return {
-    categories: tags.map((tag) => ({
-      ...tag,
-      icon: tagIcons[tag.id],
-      items: entriesByCategory[tag.id] ?? []
-    })),
-    ownerName: owner?.name ?? user.value.user_metadata?.name,
-    isLink: !!route.query.link,
-  };
+      return acc;
+    }, {});
+
+    return {
+      categories: tags.map((tag) => ({
+        ...tag,
+        icon: tagIcons[tag.id],
+        items: entriesByCategory[tag.id] ?? []
+      })),
+      ownerName: owner?.name ?? user.value.user_metadata?.name,
+      isLink: !!route.query.link,
+    };
+  } catch {
+    return emptyResponse;
+  }
 });
 
 const categoriesWithItems = computed(() => list.value.categories.filter(({ items }) => items.length))
