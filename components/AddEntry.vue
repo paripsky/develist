@@ -41,6 +41,18 @@
                 entry ? 'Save' : 'Add' }}
             </UButton>
             <UButton variant="outline" @click="resetAndClose()" :disabled="isLoading">Cancel</UButton>
+            <UPopover v-if="entry" class="mr-auto" :popper="{ placement: 'top' }">
+              <UButton variant="outline" :disabled="isLoading" color="red">Delete
+              </UButton>
+              <template #panel>
+                <UContainer class="p-4 flex gap-2 items-center">
+                  <span>Are you sure?</span>
+                  <UButton variant="ghost" :disabled="isLoading" color="red" @click="deleteEntry()">Yes
+                  </UButton>
+                </UContainer>
+              </template>
+            </UPopover>
+
           </div>
         </template>
       </UCard>
@@ -157,4 +169,17 @@ const addEntry = async () => {
   emit('save');
   resetAndClose();
 };
+
+const deleteEntry = async () => {
+  if (!props.entry) return;
+  const { error } = await client.from('entries').delete().eq('id', props.entry.id);
+
+  if (error) {
+    toast.add({ title: 'Failed to delete entry', description: error.message, color: 'red' });
+    return;
+  }
+
+  emit('save');
+  resetAndClose();
+}
 </script>

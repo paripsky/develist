@@ -19,9 +19,10 @@
   </nav>
   <main @mousemove="onMouseMove">
     <UContainer class="pt-6 md:pt-20 2xl:max-w-[1920px]">
-      <div class="flex justify-end gap-2" v-if="!list.isLink">
-        <ShareButton />
-        <AddEntry :entry="editing" :tags="list.categories" @save="refresh" @reset="editing = null" />
+      <div class="flex justify-end gap-2">
+        <UButton v-if="user && list.isLink" @click="goBackToList()">Back to my list</UButton>
+        <ShareButton v-if="!list.isLink" />
+        <AddEntry v-if="!list.isLink" :entry="editing" :tags="list.categories" @save="refresh" @reset="editing = null" />
       </div>
       <ul class="flex flex-col gap-4" v-if="pending">
         <li class="space-y-2 mt-2" v-for="i in 3">
@@ -59,13 +60,13 @@
                     <span>{{ item.title }}</span>
                     <UIcon name="i-mdi-arrow-right" class="shrink-0" />
                   </NuxtLink>
-                  <UButton v-if="user" @click="editing = item" variant="ghost" icon="i-heroicons-pencil"
+                  <UButton v-if="user && !list.isLink" @click="editing = item" variant="ghost" icon="i-heroicons-pencil"
                     class="show-on-hover transition-opacity opacity-0 group-hover:opacity-100" :color="category.color" />
                 </div>
               </template>
               <span class="line-clamp-3 whitespace-pre-wrap">{{ item.description }}</span>
               <template #footer v-if="item.image">
-                <img :src="item.image" class="h-32 w-full object-cover" />
+                <img :src="item.image" class="h-52 w-full object-cover" />
               </template>
             </HoverCard>
           </ul>
@@ -176,6 +177,16 @@ watch(() => user.value, (currentUser, previousUser) => {
   if (currentUser?.id && previousUser?.id) return;
   refresh();
 });
+
+watch(() => route.query, (newQuery, oldQuery) => {
+  if (newQuery.link !== oldQuery.link) {
+    refresh();
+  }
+});
+
+const goBackToList = () => {
+  navigateTo('/');
+}
 </script>
 
 <style scoped>
