@@ -8,14 +8,14 @@ async function getEntriesFromSharedLink({ event, linkId }) {
 
   const linkOwner = await client.auth.admin.getUserById(sharedLink.user_id);
   const owner = { name: linkOwner.data?.user?.user_metadata?.name };
-  const { data: entries } = await client.from('entries').select('*').eq('user_id', sharedLink.user_id);
+  const { data: entries } = await client.from('entries').select('*').eq('user_id', sharedLink.user_id).order('title', { ascending: true });;
 
   return { entries, owner };
 }
 
 async function getEntries({ event }) {
   const client = serverSupabaseClient(event);
-  const { data: entries } = await client.from('entries').select('*');
+  const { data: entries } = await client.from('entries').select('*').order('title', { ascending: true });
 
   return { entries };
 }
