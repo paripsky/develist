@@ -115,6 +115,7 @@ const client = useSupabaseClient();
 const route = useRoute();
 
 const editing = ref(null);
+const search = ref('');
 
 const tagIcons = {
   react: 'i-mdi-react',
@@ -127,6 +128,9 @@ const tagIcons = {
   icons: 'i-mdi-tag-emoticon',
   databases: 'i-mdi-database',
   macApps: 'i-mdi-apple',
+  tools: 'i-mdi-tools',
+  codeQualityTools: 'i-mdi-code-tags-check',
+  other: 'i-mdi-vector-difference',
 };
 
 const { data: list, refresh, pending } = await useAsyncData('list', async () => {

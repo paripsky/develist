@@ -5,7 +5,7 @@
       <UButton label="New" icon="i-heroicons-plus" @click="resetAndOpen()" :disabled="!user" />
     </UTooltip>
 
-    <UModal v-model="isOpen" @close="resetAndClose()">
+    <UModal v-model="isOpen" @close="resetAndClose()" :prevent-close="isLoading">
       <UCard :ui="{ divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
         <template #header>
           {{ entry ? 'Edit' : 'Add' }} Entry
@@ -13,7 +13,8 @@
 
         <form class="flex flex-col gap-2" @submit.prevent>
           <UFormGroup label="URL" required>
-            <UInput placeholder="https://www.example.com" v-model="url" icon="i-heroicons-link" />
+            <UInput placeholder="https://www.example.com" v-model="url" icon="i-heroicons-link"
+              :loading="isMetadataLoading" />
           </UFormGroup>
           <UFormGroup label="Title" required>
             <UInput placeholder="Entry Name" v-model="title" icon="i-heroicons-document-text" />
@@ -68,6 +69,7 @@ const toast = useToast();
 
 const isOpen = ref(false);
 const isLoading = ref(false);
+const isMetadataLoading = ref(false);
 
 const title = ref('');
 const url = ref('');
@@ -82,23 +84,45 @@ const emit = defineEmits(['save', 'reset']);
 const tagOptions = computed(() => props.tags
   .map(({ id, title, icon }) => ({ id, label: title, icon })));
 
-watch(() => url.value, async () => {
-  if (!url.value || url.value === props.entry?.url) return;
-  const meta = await $fetch(`https://og-scrapi.deno.dev/api/meta?url=${encodeURIComponent(url.value)}`).catch((error) => error.data)
-  const metaTitle = meta.title ?? meta['og:title'] ?? meta['twitter:title'];
-  const metaDescription = meta.description ?? meta['og:description'] ?? meta['twitter:description'];
-  const metaImage = meta['og:image'] ?? meta['twitter:image'];
+function isUrlValid(string) {
+  try {
+    const url = new URL(string);
+    return !!url.host;
+  } catch (err) {
+    return false;
+  }
+}
 
-  if (metaTitle && !title.value) {
-    title.value = metaTitle;
-  }
+let fetchMetaTimeout = null;
 
-  if (metaDescription && !description.value) {
-    description.value = metaDescription;
-  }
-  if (metaImage && !image.value) {
-    image.value = metaImage;
-  }
+watch(() => url.value, () => {
+  clearTimeout(fetchMetaTimeout);
+  fetchMetaTimeout = setTimeout(async () => {
+    if (!url.value || url.value === props.entry?.url || !isUrlValid(url.value)) return;
+    isMetadataLoading.value = true;
+
+    try {
+      const meta = await $fetch(`https://og-scrapi.deno.dev/api/meta?url=${encodeURIComponent(url.value)}`).catch((error) => error.data)
+      const metaTitle = meta.title ?? meta['og:title'] ?? meta['twitter:title'];
+      const metaDescription = meta.description ?? meta['og:description'] ?? meta['twitter:description'];
+      const metaImage = meta['og:image'] ?? meta['twitter:image'];
+
+      if (metaTitle && !title.value) {
+        title.value = metaTitle;
+      }
+
+      if (metaDescription && !description.value) {
+        description.value = metaDescription;
+      }
+      if (metaImage && !image.value) {
+        image.value = metaImage;
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      isMetadataLoading.value = false;
+    }
+  }, 600);
 });
 
 watch(() => props.entry, () => {
@@ -112,6 +136,7 @@ watch(() => props.entry, () => {
 });
 
 const reset = () => {
+  if (isLoading.value) return;
   title.value = '';
   url.value = '';
   description.value = '';
