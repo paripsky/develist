@@ -20,6 +20,13 @@
   <main @mousemove="onMouseMove">
     <UContainer class="pt-6 md:pt-20 2xl:max-w-[1920px]">
       <div class="flex justify-end gap-2">
+        <UInput v-model="search" name="search" placeholder="Search..." icon="i-heroicons-magnifying-glass-20-solid"
+          :ui="{ icon: { trailing: { pointer: '' } } }">
+          <template #trailing>
+            <UButton v-show="search !== ''" color="gray" variant="link" icon="i-heroicons-x-mark-20-solid" :padded="false"
+              @click="search = ''" />
+          </template>
+        </UInput>
         <UButton v-if="user && list.isLink" @click="goBackToList()">Back to my list</UButton>
         <ShareButton v-if="!list.isLink" />
         <AddEntry v-if="!list.isLink" :entry="editing" :tags="list.categories" @save="refresh" @reset="editing = null" />
@@ -169,7 +176,12 @@ const { data: list, refresh, pending } = await useAsyncData('list', async () => 
   }
 });
 
-const categoriesWithItems = computed(() => list.value.categories.filter(({ items }) => items.length))
+const categoriesWithItems = computed(() => list.value.categories
+  .map((category) => search.value ? ({
+    ...category, items: category.items
+      .filter((item) => `${item.title.toLowerCase()}${item.description.toLowerCase()}`.includes(search.value.toLowerCase()))
+  }) : category)
+  .filter(({ items }) => items.length))
 
 const mousePosition = ref({ x: 0, y: 0 });
 
