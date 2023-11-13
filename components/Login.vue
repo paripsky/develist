@@ -24,11 +24,14 @@
 <script setup>
 const isOpen = ref(false);
 const user = useSupabaseUser();
-const client = useSupabaseAuthClient();
+const client = useSupabaseClient();
 const toast = useToast();
 
 const login = async (provider) => {
-  const { error } = await client.auth.signInWithOAuth({ provider })
+  const redirectToUrl = new URL(location.href);
+  redirectToUrl.pathname = '/confirm';
+  redirectToUrl.search = '';
+  const { error } = await client.auth.signInWithOAuth({ provider, options: { redirectTo: redirectToUrl.toString() } })
   if (error) {
     return toast.add({ title: 'Login failed', color: 'red' });
   }

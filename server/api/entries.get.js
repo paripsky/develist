@@ -14,7 +14,7 @@ async function getEntriesFromSharedLink({ event, linkId }) {
 }
 
 async function getEntries({ event }) {
-  const client = serverSupabaseClient(event);
+  const client = await serverSupabaseClient(event);
   const { data: entries } = await client.from('entries').select('*').order('title', { ascending: true });
 
   return { entries };

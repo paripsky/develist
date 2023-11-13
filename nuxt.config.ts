@@ -11,5 +11,13 @@ export default defineNuxtConfig({
   ui: {
     icons: ['mdi', 'lucide', 'heroicons'],
     safelistColors: Object.keys(colors),
+  },
+  supabase: {
+    redirect: false,
+    redirectOptions: {
+      login: '/',
+      callback: '/confirm',
+      exclude: [],
+    }
   }
 })
