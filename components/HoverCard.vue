@@ -21,7 +21,7 @@ const bgColor = computed(() => colors[props.color]?.[500])
 
 <style>
 @media (pointer: fine) {
-  main:hover .card::before {
+  .card::before {
     content: '';
     filter: blur(40px);
     position: absolute;
