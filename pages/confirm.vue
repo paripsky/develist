@@ -34,9 +34,13 @@
 <script setup lang="ts">
 const user = useSupabaseUser();
 
+definePageMeta({
+  layout: 'empty',
+});
+
 watch(user, () => {
   if (user.value) {
-    return navigateTo('/')
+    return navigateTo('/');
   }
 }, { immediate: true });
 </script>

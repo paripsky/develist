@@ -1,5 +1,5 @@
 <template>
-  <div @mousemove="onMouseMove">
+  <div>
     <UContainer class="pt-2 md:pt-20 2xl:max-w-[1920px]">
       <div class="flex flex-wrap gap-4">
         <span v-if="list?.ownerName" class="mr-auto">{{ list.ownerName }}'s Develist</span>
@@ -11,7 +11,7 @@
                 :padded="false" @click="search = ''" />
             </template>
           </UInput>
-          <UButton v-if="user && list.isLink" @click="goBackToList()">Back to my list</UButton>
+          <UButton v-if="user && list.isLink" @click="resetRoute()">Back to my list</UButton>
           <ShareButton v-if="!list.isLink" />
           <AddEntry v-if="!list.isLink" :entry="editing" :tags="list.categories" @save="refresh"
             @reset="editing = null" />
@@ -48,8 +48,7 @@
             <UIcon v-if="category.icon" :name="category.icon" />
           </UBadge>
           <ul class="grid sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-            <HoverCard class="card group" v-for="item in category.items" :mousePosition="mousePosition"
-              :color="category.color">
+            <HoverCard class="card group" v-for="item in category.items" :color="category.color">
               <template #header>
                 <div class="flex justify-between">
                   <NuxtLink external target="_blank" :href="item.url" class="flex gap-1 items-center">
@@ -79,7 +78,6 @@ const route = useRoute();
 
 const editing = ref(null);
 const search = ref('');
-const ownerName = useState('ownerName');
 
 const tagIcons = {
   react: 'i-mdi-react',
@@ -96,6 +94,11 @@ const tagIcons = {
   codeQualityTools: 'i-mdi-code-tags-check',
   other: 'i-mdi-vector-difference',
 };
+
+const resetRoute = () => {
+  refreshNuxtData();
+  navigateTo('/');
+}
 
 const { data: list, refresh, pending } = await useAsyncData('list', async () => {
   const emptyResponse = { categories: [], ownerName: '', isLink: false };
@@ -140,26 +143,16 @@ const categoriesWithItems = computed(() => list.value.categories
   }) : category)
   .filter(({ items }) => items.length))
 
-const mousePosition = ref({ x: 0, y: 0 });
-
-const onMouseMove = (e) => {
-  mousePosition.value = { x: e.clientX, y: e.clientY };
-}
-
 watch(() => user.value, (currentUser, previousUser) => {
   if (currentUser?.id && previousUser?.id) return;
-  refresh();
+  resetRoute();
 });
 
 watch(() => route.query, (newQuery, oldQuery) => {
   if (newQuery.link !== oldQuery.link) {
-    refresh();
+    resetRoute();
   }
 });
-
-const goBackToList = () => {
-  navigateTo('/');
-}
 </script>
 
 <style scoped>
