@@ -101,7 +101,7 @@ const resetRoute = () => {
 }
 
 const { data: list, refresh, pending } = await useAsyncData('list', async () => {
-  const emptyResponse = { categories: [], ownerName: '', isLink: false };
+  const emptyResponse = { categories: [], ownerName: '', isLink: false, isEmptyResponse: true };
   if (!user.value && !route.query.link) return emptyResponse;
 
   try {
@@ -143,10 +143,11 @@ const categoriesWithItems = computed(() => list.value.categories
   }) : category)
   .filter(({ items }) => items.length))
 
-watch(() => user.value, (currentUser, previousUser) => {
-  if (currentUser?.id && previousUser?.id) return;
-  resetRoute();
-});
+watch(() => user.value, (currentUser) => {
+  if (currentUser?.id && list.value?.isEmptyResponse) {
+    resetRoute();
+  }
+}, { immediate: true });
 
 watch(() => route.query, (newQuery, oldQuery) => {
   if (newQuery.link !== oldQuery.link) {

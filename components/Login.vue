@@ -42,6 +42,9 @@ const logout = async () => {
   if (error) {
     return toast.add({ title: 'Logout failed', color: 'red' });
   }
+
+  refreshNuxtData();
+  navigateTo('/');
 }
 
 const menuItems = computed(() => [
