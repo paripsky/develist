@@ -145,7 +145,7 @@ const categoriesWithItems = computed(() => list.value.categories
 
 watch(() => user.value, (currentUser) => {
   if (currentUser?.id && list.value?.isEmptyResponse) {
-    resetRoute();
+    reloadNuxtApp();
   }
 }, { immediate: true });
 
